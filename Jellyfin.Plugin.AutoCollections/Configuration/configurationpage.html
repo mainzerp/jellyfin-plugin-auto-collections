@@ -85,18 +85,31 @@
               >Help</a>
             </div>
             <div class="verticalSection">
-              <div class="inputContainer">                <label class="inputLabel inputLabelUnfocused" for="title-match-pairs">Simple Collections:</label>
-                <div class="help-text">Create collections based on a simple string match. Select the type (Title, Studio, Genre, Actor, or Director), choose media type (All, Movies, or Shows), enter the string to match, and provide a collection name.</div>
-                <div id="title-match-pairs"></div>
+              <!-- Simple Collections Section -->
+              <div class="inputContainer" style="margin-bottom: 10px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                  <input type="checkbox" is="emby-checkbox" id="enable-simple-collections" checked style="margin-right: 10px;" />
+                  <span style="font-weight: bold; font-size: 1.1em;">Enable Simple Collections</span>
+                </label>
               </div>
-              
-              <button
-                id="add-title-match-button"
-                is="emby-button"
-                type="button"
-                class="raised add-title-match-button"
-              >
-                <span>Add Simple Collection</span>              </button>              <div style="margin: 20px 0 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: rgba(0,0,0,0.03);">
+              <div id="simple-collections-section">
+                <div class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="title-match-pairs">Simple Collections:</label>
+                  <div class="help-text">Create collections based on a simple string match. Select the type (Title, Studio, Genre, Actor, or Director), choose media type (All, Movies, or Shows), enter the string to match, and provide a collection name.</div>
+                  <div id="title-match-pairs"></div>
+                </div>
+                
+                <button
+                  id="add-title-match-button"
+                  is="emby-button"
+                  type="button"
+                  class="raised add-title-match-button"
+                >
+                  <span>Add Simple Collection</span>
+                </button>
+              </div>
+
+              <div style="margin: 20px 0 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: rgba(0,0,0,0.03);">
                 <h3 style="margin-top: 0; margin-bottom: 10px;">Import/Export Configuration</h3>
                 <p style="margin-bottom: 15px; font-size: 0.9em; color: #555;">
                   Export your current configuration to a JSON file or import a configuration from a JSON file.
@@ -119,48 +132,215 @@
 
               <div class="section-divider"></div>
               
-              <div class="inputContainer">
-                <label class="inputLabel inputLabelUnfocused" for="expression-collections">Advanced Collections:</label>
-                <div class="help-text">
-                  Create collections using complex boolean expressions. Examples:<br>
-                  <code>TITLE "Avengers"</code> - Items with "Avengers" in the title<br>
-                  <code>FILENAME "REMUX"</code> - Items with "REMUX" in the filename<br>
-                  <code>STUDIO "Marvel" AND GENRE "Action"</code> - Marvel action items<br>
-                  <code>STUDIO "Marvel" AND (TITLE "Spiderman" OR ACTOR "Robert Downey JR.")</code> - Marvel items with Spiderman in the title or starring Robert Downey Jr.<br>
-                  <code>GENRE "Action" AND MOVIE</code> - Action movies only (no TV shows)<br>
-                  <code>TITLE "Avengers" OR (GENRE "Action" AND SHOW)</code> - Anything with "Avengers" in the title, plus Action TV shows<br>
-                  <br>
-                  <strong>New Filter Types:</strong><br>
-                  <code>TAG "Family" AND MOVIE</code> - Movies with the "Family" tag<br>
-                  <code>PARENTALRATING "PG-13" AND GENRE "Horror"</code> - PG-13 horror content<br>
-                  <code>COMMUNITYRATING ">8.5"</code> - Items rated above 8.5<br>                  <code>CRITICSRATING ">75" AND GENRE "Drama"</code> - Well-reviewed dramas<br>
-                  <code>PRODUCTIONLOCATION "Germany" OR PRODUCTIONLOCATION "Austria"</code> - German or Austrian content<br>
-                  <code>CUSTOMRATING "PG-13" OR CUSTOMRATING "PG"</code> - Items with specified custom ratings<br>
-                  <code>CUSTOMRATING "<=7" AND MOVIE</code> - Movies with custom rating numeric value 7 or below (if numeric values stored)
-                  <br>
-                  <strong>Year Filters:</strong><br>                  <code>YEAR "&lt;2000"</code> - Content from before 2000<br>
-                  <code>YEAR "&gt;2010"</code> - Content from after 2010<br>
-                  <code>YEAR "=1994"</code> - Content from exactly 1994<br>
-                  <code>YEAR "&gt;=2000" AND YEAR "&lt;=2010"</code> - Content from the 2000s decade<br>
-                  <code>GENRE "Sci-Fi" AND YEAR "&gt;=2000" AND YEAR "&lt;=2010"</code> - Sci-Fi from the 2000s decade
-                  <br>
-                  <strong>Language Filters:</strong><br>
-                  <code>LANG "eng" AND MOVIE</code> - Movies with English audio<br>
-                  <code>SUB "eng" AND MOVIE</code> - Movies with English subtitles<br>
-                  <code>MOVIE AND (LANG "eng" OR SUB "eng")</code> - Movies with either English audio or subtitles<br>
-                  <code>MOVIE AND LANG "fra" AND NOT SUB "eng"</code> - French audio movies without English subtitles
-                </div>
-                <div id="expression-collections"></div>
+              <!-- Advanced Collections Section -->
+              <div class="inputContainer" style="margin-bottom: 10px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                  <input type="checkbox" is="emby-checkbox" id="enable-advanced-collections" checked style="margin-right: 10px;" />
+                  <span style="font-weight: bold; font-size: 1.1em;">Enable Advanced Collections</span>
+                </label>
               </div>
-              
-              <button
-                id="add-expression-collection-button"
-                is="emby-button"
-                type="button"
-                class="raised add-title-match-button"
-              >
-                <span>Add Advanced Collection</span>
-              </button>
+              <div id="advanced-collections-section">
+                <div class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="expression-collections">Advanced Collections:</label>
+                  <div class="help-text">
+                    Create collections using complex boolean expressions. Examples:<br>
+                    <code>TITLE "Avengers"</code> - Items with "Avengers" in the title<br>
+                    <code>FILENAME "REMUX"</code> - Items with "REMUX" in the filename<br>
+                    <code>STUDIO "Marvel" AND GENRE "Action"</code> - Marvel action items<br>
+                    <code>STUDIO "Marvel" AND (TITLE "Spiderman" OR ACTOR "Robert Downey JR.")</code> - Marvel items with Spiderman in the title or starring Robert Downey Jr.<br>
+                    <code>GENRE "Action" AND MOVIE</code> - Action movies only (no TV shows)<br>
+                    <code>TITLE "Avengers" OR (GENRE "Action" AND SHOW)</code> - Anything with "Avengers" in the title, plus Action TV shows<br>
+                    <br>
+                    <strong>New Filter Types:</strong><br>
+                    <code>TAG "Family" AND MOVIE</code> - Movies with the "Family" tag<br>
+                    <code>PARENTALRATING "PG-13" AND GENRE "Horror"</code> - PG-13 horror content<br>
+                    <code>COMMUNITYRATING ">8.5"</code> - Items rated above 8.5<br>
+                    <code>CRITICSRATING ">75" AND GENRE "Drama"</code> - Well-reviewed dramas<br>
+                    <code>PRODUCTIONLOCATION "Germany" OR PRODUCTIONLOCATION "Austria"</code> - German or Austrian content<br>
+                    <code>CUSTOMRATING "PG-13" OR CUSTOMRATING "PG"</code> - Items with specified custom ratings<br>
+                    <code>CUSTOMRATING "<=7" AND MOVIE</code> - Movies with custom rating numeric value 7 or below (if numeric values stored)
+                    <br>
+                    <strong>Year Filters:</strong><br>
+                    <code>YEAR "&lt;2000"</code> - Content from before 2000<br>
+                    <code>YEAR "&gt;2010"</code> - Content from after 2010<br>
+                    <code>YEAR "=1994"</code> - Content from exactly 1994<br>
+                    <code>YEAR "&gt;=2000" AND YEAR "&lt;=2010"</code> - Content from the 2000s decade<br>
+                    <code>GENRE "Sci-Fi" AND YEAR "&gt;=2000" AND YEAR "&lt;=2010"</code> - Sci-Fi from the 2000s decade
+                    <br>
+                    <strong>Language Filters:</strong><br>
+                    <code>LANG "eng" AND MOVIE</code> - Movies with English audio<br>
+                    <code>SUB "eng" AND MOVIE</code> - Movies with English subtitles<br>
+                    <code>MOVIE AND (LANG "eng" OR SUB "eng")</code> - Movies with either English audio or subtitles<br>
+                    <code>MOVIE AND LANG "fra" AND NOT SUB "eng"</code> - French audio movies without English subtitles
+                  </div>
+                  <div id="expression-collections"></div>
+                </div>
+                
+                <button
+                  id="add-expression-collection-button"
+                  is="emby-button"
+                  type="button"
+                  class="raised add-title-match-button"
+                >
+                  <span>Add Advanced Collection</span>
+                </button>
+              </div>
+
+              <div class="section-divider"></div>
+
+              <!-- Auto-Discovery Collections Section -->
+              <div class="inputContainer" style="margin-bottom: 10px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                  <input type="checkbox" is="emby-checkbox" id="enable-auto-discovery" style="margin-right: 10px;" />
+                  <span style="font-weight: bold; font-size: 1.1em;">Enable Auto-Discovery Collections</span>
+                </label>
+                <div class="help-text">Automatically create collections based on your library content. No manual configuration needed!</div>
+              </div>
+              <div id="auto-discovery-section" style="display: none; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: rgba(0,0,0,0.03); margin-bottom: 20px;">
+                
+                <!-- Movie Series Detection -->
+                <div style="margin-bottom: 20px; padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 4px;">
+                  <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 10px;">
+                    <input type="checkbox" is="emby-checkbox" id="detect-movie-series" checked style="margin-right: 10px;" />
+                    <span style="font-weight: bold;">Detect Movie Series/Franchises</span>
+                  </label>
+                  <div class="help-text" style="margin-bottom: 10px;">Automatically detects films with similar titles like "John Wick 1-4", "Star Wars Episode I-IX", etc.</div>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div>
+                      <label style="font-size: 0.9em;">Minimum movies in series:</label>
+                      <select is="emby-select" id="min-movies-in-series" style="width: 80px; margin-left: 5px;">
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="font-size: 0.9em;">Naming pattern:</label>
+                      <select is="emby-select" id="movie-series-naming" style="width: 180px; margin-left: 5px;">
+                        <option value="{Title} Collection" selected>{Title} Collection</option>
+                        <option value="{Title} Saga">{Title} Saga</option>
+                        <option value="{Title} Movies">{Title} Movies</option>
+                        <option value="{Title} Series">{Title} Series</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="margin-top: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                      <input type="checkbox" is="emby-checkbox" id="include-first-without-number" checked style="margin-right: 8px;" />
+                      <span style="font-size: 0.9em;">Include first movie without number (e.g., "John Wick" + "John Wick 2")</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; margin-top: 5px;">
+                      <input type="checkbox" is="emby-checkbox" id="include-spinoffs" style="margin-right: 8px;" />
+                      <span style="font-size: 0.9em;">Include spin-offs (matches "A {Title} Story" pattern)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Genre Collections -->
+                <div style="margin-bottom: 20px; padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 4px;">
+                  <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 10px;">
+                    <input type="checkbox" is="emby-checkbox" id="create-genre-collections" style="margin-right: 10px;" />
+                    <span style="font-weight: bold;">Create Genre Collections</span>
+                  </label>
+                  <div class="help-text" style="margin-bottom: 10px;">Automatically creates collections for each genre (Action, Comedy, Drama, etc.)</div>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div>
+                      <label style="font-size: 0.9em;">Minimum items per genre:</label>
+                      <select is="emby-select" id="min-items-per-genre" style="width: 80px; margin-left: 5px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="font-size: 0.9em;">Naming pattern:</label>
+                      <select is="emby-select" id="genre-naming" style="width: 180px; margin-left: 5px;">
+                        <option value="{Genre} Movies" selected>{Genre} Movies</option>
+                        <option value="{Genre} Collection">{Genre} Collection</option>
+                        <option value="{Genre}">{Genre}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Studio Collections -->
+                <div style="margin-bottom: 20px; padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 4px;">
+                  <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 10px;">
+                    <input type="checkbox" is="emby-checkbox" id="create-studio-collections" style="margin-right: 10px;" />
+                    <span style="font-weight: bold;">Create Studio Collections</span>
+                  </label>
+                  <div class="help-text" style="margin-bottom: 10px;">Automatically creates collections for each studio (Marvel, Pixar, Warner Bros, etc.)</div>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div>
+                      <label style="font-size: 0.9em;">Minimum items per studio:</label>
+                      <select is="emby-select" id="min-items-per-studio" style="width: 80px; margin-left: 5px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="font-size: 0.9em;">Naming pattern:</label>
+                      <select is="emby-select" id="studio-naming" style="width: 180px; margin-left: 5px;">
+                        <option value="{Studio}" selected>{Studio}</option>
+                        <option value="{Studio} Productions">{Studio} Productions</option>
+                        <option value="{Studio} Collection">{Studio} Collection</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Decade Collections -->
+                <div style="margin-bottom: 20px; padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 4px;">
+                  <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 10px;">
+                    <input type="checkbox" is="emby-checkbox" id="create-decade-collections" style="margin-right: 10px;" />
+                    <span style="font-weight: bold;">Create Decade Collections</span>
+                  </label>
+                  <div class="help-text" style="margin-bottom: 10px;">Automatically creates collections by decade (1990s, 2000s, 2010s, etc.)</div>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div>
+                      <label style="font-size: 0.9em;">Minimum items per decade:</label>
+                      <select is="emby-select" id="min-items-per-decade" style="width: 80px; margin-left: 5px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="font-size: 0.9em;">Naming pattern:</label>
+                      <select is="emby-select" id="decade-naming" style="width: 180px; margin-left: 5px;">
+                        <option value="{Decade}s Movies" selected>{Decade}s Movies</option>
+                        <option value="{Decade}s Collection">{Decade}s Collection</option>
+                        <option value="{Decade}s">{Decade}s</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Additional Options -->
+                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 4px;">
+                  <h4 style="margin-top: 0; margin-bottom: 10px;">Additional Options</h4>
+                  <div style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9em;">Prefix for auto-generated collections:</label>
+                    <input type="text" is="emby-input" id="auto-discovery-prefix" placeholder="e.g., [Auto] " style="width: 150px; margin-left: 5px;" />
+                  </div>
+                  <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" is="emby-checkbox" id="skip-existing-manual" checked style="margin-right: 8px;" />
+                    <span style="font-size: 0.9em;">Skip if manual collection with same name exists</span>
+                  </label>
+                </div>
+              </div>
               
               <br />
               <button
@@ -575,6 +755,36 @@
                 const element = createExpressionCollectionElement();
                 expressionCollectionsContainer.appendChild(element);
               }
+
+              // Load section toggles
+              document.getElementById('enable-simple-collections').checked = config.EnableSimpleCollections !== false;
+              document.getElementById('enable-advanced-collections').checked = config.EnableAdvancedCollections !== false;
+              document.getElementById('enable-auto-discovery').checked = config.EnableAutoDiscovery === true;
+
+              // Update section visibility
+              updateSectionVisibility();
+
+              // Load Auto-Discovery settings
+              document.getElementById('detect-movie-series').checked = config.DetectMovieSeries !== false;
+              document.getElementById('min-movies-in-series').value = config.MinMoviesInSeries || 2;
+              document.getElementById('movie-series-naming').value = config.MovieSeriesNamingPattern || '{Title} Collection';
+              document.getElementById('include-first-without-number').checked = config.IncludeFirstMovieWithoutNumber !== false;
+              document.getElementById('include-spinoffs').checked = config.IncludeSpinoffs === true;
+
+              document.getElementById('create-genre-collections').checked = config.CreateGenreCollections === true;
+              document.getElementById('min-items-per-genre').value = config.MinItemsPerGenre || 3;
+              document.getElementById('genre-naming').value = config.GenreNamingPattern || '{Genre} Movies';
+
+              document.getElementById('create-studio-collections').checked = config.CreateStudioCollections === true;
+              document.getElementById('min-items-per-studio').value = config.MinItemsPerStudio || 5;
+              document.getElementById('studio-naming').value = config.StudioNamingPattern || '{Studio}';
+
+              document.getElementById('create-decade-collections').checked = config.CreateDecadeCollections === true;
+              document.getElementById('min-items-per-decade').value = config.MinItemsPerDecade || 3;
+              document.getElementById('decade-naming').value = config.DecadeNamingPattern || '{Decade}s Movies';
+
+              document.getElementById('auto-discovery-prefix').value = config.AutoDiscoveryPrefix || '';
+              document.getElementById('skip-existing-manual').checked = config.SkipExistingManualCollections !== false;
             })
             .catch(function (error) {
               console.error(error);
@@ -693,7 +903,38 @@
             IsInitialized: true, // Mark as initialized to prevent defaults from being re-added
             // Keep these empty for backward compatibility
             TagTitlePairs: [],
-            Tags: []
+            Tags: [],
+            
+            // Section toggles
+            EnableSimpleCollections: document.getElementById('enable-simple-collections').checked,
+            EnableAdvancedCollections: document.getElementById('enable-advanced-collections').checked,
+            EnableAutoDiscovery: document.getElementById('enable-auto-discovery').checked,
+            
+            // Auto-Discovery: Movie Series
+            DetectMovieSeries: document.getElementById('detect-movie-series').checked,
+            MinMoviesInSeries: parseInt(document.getElementById('min-movies-in-series').value, 10) || 2,
+            MovieSeriesNamingPattern: document.getElementById('movie-series-naming').value || '{Title} Collection',
+            IncludeFirstMovieWithoutNumber: document.getElementById('include-first-without-number').checked,
+            IncludeSpinoffs: document.getElementById('include-spinoffs').checked,
+            
+            // Auto-Discovery: Genre
+            CreateGenreCollections: document.getElementById('create-genre-collections').checked,
+            MinItemsPerGenre: parseInt(document.getElementById('min-items-per-genre').value, 10) || 3,
+            GenreNamingPattern: document.getElementById('genre-naming').value || '{Genre} Movies',
+            
+            // Auto-Discovery: Studio
+            CreateStudioCollections: document.getElementById('create-studio-collections').checked,
+            MinItemsPerStudio: parseInt(document.getElementById('min-items-per-studio').value, 10) || 5,
+            StudioNamingPattern: document.getElementById('studio-naming').value || '{Studio}',
+            
+            // Auto-Discovery: Decade
+            CreateDecadeCollections: document.getElementById('create-decade-collections').checked,
+            MinItemsPerDecade: parseInt(document.getElementById('min-items-per-decade').value, 10) || 3,
+            DecadeNamingPattern: document.getElementById('decade-naming').value || '{Decade}s Movies',
+            
+            // Auto-Discovery: Additional Options
+            AutoDiscoveryPrefix: document.getElementById('auto-discovery-prefix').value || '',
+            SkipExistingManualCollections: document.getElementById('skip-existing-manual').checked
           };
           
           window.ApiClient.updatePluginConfiguration(
@@ -722,7 +963,20 @@
                 message: "Unexpected error occurred!"
               });
             });
-        }        // Initialize the page
+        }
+
+        // Function to update section visibility based on toggles
+        function updateSectionVisibility() {
+          const simpleEnabled = document.getElementById('enable-simple-collections').checked;
+          const advancedEnabled = document.getElementById('enable-advanced-collections').checked;
+          const autoDiscoveryEnabled = document.getElementById('enable-auto-discovery').checked;
+
+          document.getElementById('simple-collections-section').style.display = simpleEnabled ? 'block' : 'none';
+          document.getElementById('advanced-collections-section').style.display = advancedEnabled ? 'block' : 'none';
+          document.getElementById('auto-discovery-section').style.display = autoDiscoveryEnabled ? 'block' : 'none';
+        }
+
+        // Initialize the page
         loadConfig();
         
         // Add event listeners
@@ -730,7 +984,14 @@
         document.querySelector("#add-title-match-button").addEventListener("click", function() {
           const element = createTitleMatchPairElement();
           document.querySelector("#title-match-pairs").appendChild(element);
-        });        document.querySelector("#add-expression-collection-button").addEventListener("click", function() {
+        });
+
+        // Section toggle event listeners
+        document.getElementById('enable-simple-collections').addEventListener('change', updateSectionVisibility);
+        document.getElementById('enable-advanced-collections').addEventListener('change', updateSectionVisibility);
+        document.getElementById('enable-auto-discovery').addEventListener('change', updateSectionVisibility);
+
+        document.querySelector("#add-expression-collection-button").addEventListener("click", function() {
           const element = createExpressionCollectionElement();
           document.querySelector("#expression-collections").appendChild(element);
           // Setup validation for the new expression input

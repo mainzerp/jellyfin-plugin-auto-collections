@@ -19,6 +19,7 @@ using Jellyfin.Data.Enums;
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Providers;
 using Jellyfin.Plugin.AutoCollections.Configuration;
+using Jellyfin.Plugin.AutoCollections.AutoDiscovery;
 
 namespace Jellyfin.Plugin.AutoCollections
 {
@@ -641,75 +642,205 @@ namespace Jellyfin.Plugin.AutoCollections
         {
             _logger.LogInformation("Performing ExecuteAutoCollections");
             
-            // Get title match pairs from configuration - this is the basic approach
-            var titleMatchPairs = Plugin.Instance!.Configuration.TitleMatchPairs;
-            // Get expression collections - this is the advanced approach
-            var expressionCollections = Plugin.Instance!.Configuration.ExpressionCollections;
+            var config = Plugin.Instance!.Configuration;
             
-            int totalCollections = titleMatchPairs.Count + expressionCollections.Count;
+            // Get title match pairs from configuration - this is the basic approach
+            // Only include if Simple Collections are enabled
+            var titleMatchPairs = config.EnableSimpleCollections 
+                ? config.TitleMatchPairs 
+                : new List<TitleMatchPair>();
+            
+            // Get expression collections - this is the advanced approach
+            // Only include if Advanced Collections are enabled
+            var expressionCollections = config.EnableAdvancedCollections 
+                ? config.ExpressionCollections 
+                : new List<ExpressionCollection>();
+            
+            // Discover auto-discovery collections
+            var autoDiscoveryManager = new AutoDiscoveryManager(_libraryManager, _logger);
+            var discoveredCollections = autoDiscoveryManager.DiscoverCollections(config);
+            
+            int totalCollections = titleMatchPairs.Count + expressionCollections.Count + discoveredCollections.Count;
             int processedCollections = 0;
             
-            _logger.LogInformation($"Starting execution of Auto collections: {titleMatchPairs.Count} title match pairs + {expressionCollections.Count} expression collections = {totalCollections} total");
+            _logger.LogInformation($"Starting execution of Auto collections: {titleMatchPairs.Count} simple + {expressionCollections.Count} advanced + {discoveredCollections.Count} auto-discovered = {totalCollections} total");
             
             // Report initial progress
             progress.Report(0);
 
-            foreach (var titleMatchPair in titleMatchPairs)
+            // Process Simple Collections
+            if (config.EnableSimpleCollections)
             {
-                // Check for cancellation
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                try
+                foreach (var titleMatchPair in titleMatchPairs)
                 {
-                    _logger.LogInformation($"Processing Auto collection for title match: {titleMatchPair.TitleMatch} ({processedCollections + 1} of {totalCollections})");
-                    await ExecuteAutoCollectionsForTitleMatchPair(titleMatchPair);
+                    // Check for cancellation
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
+                    try
+                    {
+                        _logger.LogInformation($"Processing Simple collection for title match: {titleMatchPair.TitleMatch} ({processedCollections + 1} of {totalCollections})");
+                        await ExecuteAutoCollectionsForTitleMatchPair(titleMatchPair);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Auto Collections task was cancelled");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error processing Simple collection for title match: {titleMatchPair.TitleMatch}");
+                        // Continue with next title-match pair even if one fails
+                    }
+                    
+                    processedCollections++;
+                    double progressPercentage = totalCollections > 0 ? (double)processedCollections / totalCollections * 100 : 100;
+                    progress.Report(progressPercentage);
+                    _logger.LogDebug($"Progress: {processedCollections} of {totalCollections} collections complete ({progressPercentage:F1}%)");
                 }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogInformation("Auto Collections task was cancelled");
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"Error processing Auto collection for title match: {titleMatchPair.TitleMatch}");
-                    // Continue with next title-match pair even if one fails
-                }
-                
-                processedCollections++;
-                double progressPercentage = totalCollections > 0 ? (double)processedCollections / totalCollections * 100 : 100;
-                progress.Report(progressPercentage);
-                _logger.LogDebug($"Progress: {processedCollections} of {totalCollections} collections complete ({progressPercentage:F1}%)");
             }
 
-            foreach (var expressionCollection in expressionCollections)
+            // Process Advanced Collections
+            if (config.EnableAdvancedCollections)
             {
-                // Check for cancellation
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                try
+                foreach (var expressionCollection in expressionCollections)
                 {
-                    _logger.LogInformation($"Processing Advanced collection: {expressionCollection.CollectionName} ({processedCollections + 1} of {totalCollections})");
-                    await ExecuteAutoCollectionsForExpressionCollection(expressionCollection);
+                    // Check for cancellation
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
+                    try
+                    {
+                        _logger.LogInformation($"Processing Advanced collection: {expressionCollection.CollectionName} ({processedCollections + 1} of {totalCollections})");
+                        await ExecuteAutoCollectionsForExpressionCollection(expressionCollection);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Auto Collections task was cancelled");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error processing Advanced collection: {expressionCollection.CollectionName}");
+                        // Continue with next expression collection even if one fails
+                    }
+                    
+                    processedCollections++;
+                    double progressPercentage = totalCollections > 0 ? (double)processedCollections / totalCollections * 100 : 100;
+                    progress.Report(progressPercentage);
+                    _logger.LogDebug($"Progress: {processedCollections} of {totalCollections} collections complete ({progressPercentage:F1}%)");
                 }
-                catch (OperationCanceledException)
+            }
+
+            // Process Auto-Discovery Collections
+            if (config.EnableAutoDiscovery)
+            {
+                foreach (var discoveredCollection in discoveredCollections)
                 {
-                    _logger.LogInformation("Auto Collections task was cancelled");
-                    throw;
+                    // Check for cancellation
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
+                    try
+                    {
+                        _logger.LogInformation($"Processing Auto-Discovery collection: {discoveredCollection.Name} ({processedCollections + 1} of {totalCollections})");
+                        await ExecuteAutoDiscoveryCollection(discoveredCollection, config.SkipExistingManualCollections);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Auto Collections task was cancelled");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error processing Auto-Discovery collection: {discoveredCollection.Name}");
+                        // Continue with next collection even if one fails
+                    }
+                    
+                    processedCollections++;
+                    double progressPercentage = totalCollections > 0 ? (double)processedCollections / totalCollections * 100 : 100;
+                    progress.Report(progressPercentage);
+                    _logger.LogDebug($"Progress: {processedCollections} of {totalCollections} collections complete ({progressPercentage:F1}%)");
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"Error processing Advanced collection: {expressionCollection.CollectionName}");
-                    // Continue with next expression collection even if one fails
-                }
-                
-                processedCollections++;
-                double progressPercentage = totalCollections > 0 ? (double)processedCollections / totalCollections * 100 : 100;
-                progress.Report(progressPercentage);
-                _logger.LogDebug($"Progress: {processedCollections} of {totalCollections} collections complete ({progressPercentage:F1}%)");
             }
 
             progress.Report(100);
             _logger.LogInformation($"Completed execution of all {totalCollections} Auto collections");
+        }
+
+        /// <summary>
+        /// Executes an auto-discovered collection by creating or updating it.
+        /// </summary>
+        private async Task ExecuteAutoDiscoveryCollection(DiscoveredCollection discoveredCollection, bool skipExistingManual)
+        {
+            var collectionName = discoveredCollection.Name;
+            
+            // Check if we should skip existing manual collections
+            if (skipExistingManual)
+            {
+                var existingNonAutoCollection = _libraryManager.GetItemList(new InternalItemsQuery
+                {
+                    IncludeItemTypes = new[] { BaseItemKind.BoxSet },
+                    CollapseBoxSetItems = false,
+                    Recursive = true,
+                    Name = collectionName,
+                }).Where(b => b is BoxSet boxSet && 
+                    (boxSet.Tags == null || !boxSet.Tags.Contains("Autocollection")))
+                  .FirstOrDefault();
+
+                if (existingNonAutoCollection != null)
+                {
+                    _logger.LogDebug($"Skipping Auto-Discovery collection '{collectionName}' - manual collection with same name exists");
+                    return;
+                }
+            }
+
+            // Get or create the collection
+            var collection = GetBoxSetByName(collectionName);
+            
+            if (collection == null)
+            {
+                _logger.LogInformation($"Creating new Auto-Discovery collection: {collectionName}");
+                var collectionResult = await _collectionManager.CreateCollectionAsync(new CollectionCreationOptions
+                {
+                    Name = collectionName,
+                    IsLocked = false,
+                });
+                collection = collectionResult;
+
+                // Tag the collection as auto-generated
+                if (collection != null)
+                {
+                    var tags = collection.Tags?.ToList() ?? new List<string>();
+                    if (!tags.Contains("Autocollection"))
+                    {
+                        tags.Add("Autocollection");
+                        collection.Tags = tags.ToArray();
+                    }
+                    if (!tags.Contains("AutoDiscovery"))
+                    {
+                        tags.Add("AutoDiscovery");
+                        collection.Tags = tags.ToArray();
+                    }
+                    await _libraryManager.UpdateItemAsync(collection, collection.GetParent(), ItemUpdateType.MetadataEdit, CancellationToken.None);
+                }
+            }
+
+            if (collection == null)
+            {
+                _logger.LogWarning($"Failed to create or find collection: {collectionName}");
+                return;
+            }
+
+            // Get item IDs to add
+            var itemIds = discoveredCollection.Items.Select(i => i.Id).ToList();
+            
+            // Add items to collection
+            if (itemIds.Any())
+            {
+                await _collectionManager.AddToCollectionAsync(collection.Id, itemIds);
+                _logger.LogInformation($"Added {itemIds.Count} items to Auto-Discovery collection: {collectionName}");
+            }
+
+            // Remove items that are no longer part of the discovered collection
+            await RemoveUnwantedMediaItems(collection, discoveredCollection.Items);
         }
 
         // ================================================================

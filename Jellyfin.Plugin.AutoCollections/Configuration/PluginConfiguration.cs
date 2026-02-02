@@ -132,7 +132,47 @@ namespace Jellyfin.Plugin.AutoCollections.Configuration
             
             // Flag to track if configuration has been initialized to prevent resetting user's intentional empty collections
             IsInitialized = false;
+            
+            // Section enable/disable toggles (default: enabled for backward compatibility)
+            EnableSimpleCollections = true;
+            EnableAdvancedCollections = true;
+            
+            // Auto-Discovery Settings (default: disabled)
+            EnableAutoDiscovery = false;
+            
+            // Movie Series Detection
+            DetectMovieSeries = true;
+            MinMoviesInSeries = 2;
+            MovieSeriesNamingPattern = "{Title} Collection";
+            IncludeFirstMovieWithoutNumber = true;
+            IncludeSpinoffs = false;
+            
+            // Genre Collections
+            CreateGenreCollections = false;
+            MinItemsPerGenre = 3;
+            GenreNamingPattern = "{Genre} Movies";
+            
+            // Studio Collections
+            CreateStudioCollections = false;
+            MinItemsPerStudio = 5;
+            StudioNamingPattern = "{Studio}";
+            
+            // Decade Collections
+            CreateDecadeCollections = false;
+            MinItemsPerDecade = 3;
+            DecadeNamingPattern = "{Decade}s Movies";
+            
+            // Additional Auto-Discovery Options
+            AutoDiscoveryPrefix = "";
+            SkipExistingManualCollections = true;
         }
+
+        // ================================================================
+        // SECTION TOGGLES
+        // ================================================================
+        // Master toggles for enabling/disabling collection sections
+        public bool EnableSimpleCollections { get; set; }
+        public bool EnableAdvancedCollections { get; set; }
 
         public List<TitleMatchPair> TitleMatchPairs { get; set; }
         
@@ -142,6 +182,38 @@ namespace Jellyfin.Plugin.AutoCollections.Configuration
         // Flag to indicate whether the configuration has been properly initialized
         // This prevents resetting the config when users intentionally have empty TitleMatchPairs
         public bool IsInitialized { get; set; }
+        
+        // ================================================================
+        // AUTO-DISCOVERY SETTINGS
+        // ================================================================
+        // Master toggle for auto-discovery feature
+        public bool EnableAutoDiscovery { get; set; }
+        
+        // Movie Series Detection
+        public bool DetectMovieSeries { get; set; }
+        public int MinMoviesInSeries { get; set; }
+        public string MovieSeriesNamingPattern { get; set; }
+        public bool IncludeFirstMovieWithoutNumber { get; set; }
+        public bool IncludeSpinoffs { get; set; }
+        
+        // Genre Collections
+        public bool CreateGenreCollections { get; set; }
+        public int MinItemsPerGenre { get; set; }
+        public string GenreNamingPattern { get; set; }
+        
+        // Studio Collections
+        public bool CreateStudioCollections { get; set; }
+        public int MinItemsPerStudio { get; set; }
+        public string StudioNamingPattern { get; set; }
+        
+        // Decade Collections
+        public bool CreateDecadeCollections { get; set; }
+        public int MinItemsPerDecade { get; set; }
+        public string DecadeNamingPattern { get; set; }
+        
+        // Additional Options
+        public string AutoDiscoveryPrefix { get; set; }
+        public bool SkipExistingManualCollections { get; set; }
         
         // Keep these for backward compatibility but they won't be used
         [Obsolete("Use TitleMatchPairs instead")]
