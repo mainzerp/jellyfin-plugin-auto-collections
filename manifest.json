@@ -9,6 +9,14 @@
         "category": "General",
         "versions": [
             {
+                "version": "0.5.0.0",
+                "changelog": "- NEW: Auto-Discovery Collections feature\n- Automatic detection of movie franchises (John Wick, Star Wars, etc.)\n- Automatic genre-based collections\n- Automatic studio-based collections\n- Automatic decade-based collections\n- Section toggles for Simple/Advanced/Auto-Discovery\n- See the full changelog at [GitHub](https://github.com/mainzerp/jellyfin-plugin-auto-collections/releases/tag/0.5.0)\n",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/mainzerp/jellyfin-plugin-auto-collections/releases/download/0.5.0/auto-collections-0.5.0.zip",
+                "checksum": "0c666428efa2082c951711c2887a32e7",
+                "timestamp": "2025-01-15T12:00:00Z"
+            },
+            {
                 "version": "0.0.4.1",
                 "changelog": "- See the full changelog at [GitHub](https://github.com/KeksBombe/jellyfin-plugin-auto-collections/releases/tag/0.0.4.1)\n",
                 "targetAbi": "10.11.0.0",
